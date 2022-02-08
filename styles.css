@@ -13,7 +13,7 @@ body {
     padding: 1em;
 }
 
-.keyboard {
+.keyboard {    
     display: grid;
     grid-template-columns: repeat(20, minmax(auto, 1.25em));
     grid-auto-rows: 2em;
@@ -21,7 +21,7 @@ body {
     justify-content: center;
 }
 
-.key {
+.key {                       /* keyboard styles, and colors put in variables to edit them when hovered*/
     font-size: inherit;
     grid-column: span 2;
     border: none;
@@ -30,9 +30,9 @@ body {
     justify-content: center;
     align-items: center;
     background-color: hsl(
-        var(--hue, 200),
-        var(--saturation, 1%),
-        calc(var(--lightness-offset, 0%) + var(--lightness, 51%))
+        var(--hue, 200),                                                /* These are the variables */
+        var(--saturation, 1%),                                          /* These are the variables */
+        calc(var(--lightness-offset, 0%) + var(--lightness, 51%))       /* These are the variables */
       );
     color: white;
     fill: white;
@@ -51,7 +51,7 @@ body {
     height: 1.75em;
 }
 
-.key:hover, .key:focus {
+.key:hover, .key:focus {        /* Hover effects */
     --lightness-offset: 10%;
 }
 
@@ -92,5 +92,23 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
-    transition: transform 250ms linear;
+}
+
+.laatta[data-state="active"] {
+    border-color: hsl(200, 1%, 34%);
+}
+
+.laatta[data-state="wrong"] {
+    border: none;
+    background-color: hsl(240, 2%, 23%);
+}
+
+.laatta[data-state="wrong-loc"] {
+    border: none;
+    background-color: hsl(49, 51%, 47%);
+}
+
+.laatta[data-state="correct"] {
+    border: none;
+    background-color: hsl(115, 29%, 43%);
 }
