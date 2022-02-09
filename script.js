@@ -15294,7 +15294,22 @@ const vaaratSanat = [
         ]
 ]
 
- // startInteraction()
+const alertContainer = document.querySelector("[data-alert-container]")
+const arvausGrid = document.querySelector("[data-arvaus-grid]")
+const maxLength = 5
+
+// here we pick the starting day of our game, and regarding to that, every single day has a diffirent word
+const offsetFromDate = new Date(2022, 1, 9) // staring day now is 9th of february 2022
+const msOffset = Date.now() - offsetFromDate
+const dayOffset = msOffset / 1000 / 60 / 60 / 24  // this converts ms to days
+const oikeaSana = kohdeSanat[Math.floor(dayOffset)] // rounds the number down
+
+// console.log(dayOffset) // <--- comment that off, so you can see how many days its been since this started
+
+
+ startInteraction()
+
+
 
 function startInteraction() {
     document.addEventListener("click", handleMouseClick)
@@ -15319,7 +15334,7 @@ function handleMouseClick(e) {
 
     if (e.target.matches("[data-delete]")) {
         deleteKey()
-        return
+        
     }
 }
 
@@ -15333,9 +15348,56 @@ function handleKeyPress(e) {
     deleteKey()
     return
     }
-    if (e.target.match(/^[a-z$]/)) { // Do we have one letter, that is between A to Z in our key?
-        pressKey(e.key)              // if yes, we call this
-        return
+    if (e.key.match(/^[a-z$]/)) { // Do we have one letter, that is between A to Z in our key?
+    pressKey(e.key)              // if yes, we call this
+    
     }
 
 }
+
+function pressKey(key) {
+    const usedTiles = getUsedTiles()  // no more than 5 letters in a word
+    if (usedTiles.length >= maxLength) return
+    const nextLaatta = arvausGrid.querySelector(":not([data-letter])")      // We take the fisrt tile that does not have a letter on it
+    nextLaatta.dataset.letter = key.toLowerCase()                           // We take the nect tile that does not have property in it
+    nextLaatta.textContent = key
+    nextLaatta.dataset.state = "active"
+}
+
+function deleteKey() {
+    const usedTiles = getUsedTiles()    // setting the last known used tile empty
+    const lastTile = usedTiles[usedTiles.length - 1]
+    if (lastTile == null) return
+    lastTile.textContent = ""
+    delete lastTile.dataset.state
+    delete lastTile.dataset.letter
+}
+
+function submitGuess() {
+    const usedTiles = [...getUsedTiles()] //... convert this to array
+    if (usedTiles.length !== maxLength) {
+        showAlert("The word must be 5 letters long!")
+        shakeTiles(usedTiles)
+    }
+}
+
+function getUsedTiles() {
+    return arvausGrid.querySelectorAll('[data-state="active"]') //evert tile that is used, is no longer usable
+}
+
+function showAlert(message, duration = 1000) {
+    const alert = document.createElement("div")
+    alert.textContent = message
+    alert.classList.add("alert")
+    alertContainer.prepend(alert)  //adding the newest alert to the top of the list
+
+    if (duration == null) return 
+        setTimeout(() => {
+            alert.classList.add("hide")
+            alert.addEventListener("transitioned", () => {
+                alert.remove()
+            })
+        }, duration)
+}
+
+// continue here with shake tiles
