@@ -15308,7 +15308,7 @@ const oikeaSana = kohdeSanat[Math.floor(dayOffset)] // rounds the number down
 
 
  startInteraction()
-
+ 
 
 
 function startInteraction() {
@@ -15381,6 +15381,8 @@ function submitGuess() {
     }
 }
 
+// jatka tähän missä katsot onko sana listalla!
+
 function getUsedTiles() {
     return arvausGrid.querySelectorAll('[data-state="active"]') //evert tile that is used, is no longer usable
 }
@@ -15400,4 +15402,15 @@ function showAlert(message, duration = 1000) {
         }, duration)
 }
 
-// continue here with shake tiles
+function shakeTiles(tiles) {
+    tiles.forEach(laatta => {
+      laatta.classList.add("shake")
+      laatta.addEventListener(
+        "animationend",
+        () => {
+          laatta.classList.remove("shake")
+        },
+        { once: true }
+      )
+    })
+  }
