@@ -15294,6 +15294,8 @@ const vaaratSanat = [
         ]
 ]
 
+const SPIN_ANIMATION_DURATION = 500
+const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
 const arvausGrid = document.querySelector("[data-arvaus-grid]")
 const maxLength = 5
@@ -15359,9 +15361,9 @@ function pressKey(key) {
     const usedTiles = getUsedTiles()  // no more than 5 letters in a word
     if (usedTiles.length >= maxLength) return
     const nextLaatta = arvausGrid.querySelector(":not([data-letter])")      // We take the fisrt tile that does not have a letter on it
-    nextLaatta.dataset.letter = key.toLowerCase()                           // We take the nect tile that does not have property in it
+    nextLaatta.dataset.letter = key.toLowerCase()                           // We take the next tile that does not have property in it
     nextLaatta.textContent = key
-    nextLaatta.dataset.state = "active"
+    nextLaatta.dataset.state = "used"
 }
 
 function deleteKey() {
@@ -15379,12 +15381,50 @@ function submitGuess() {
         showAlert("The word must be 5 letters long!")
         shakeTiles(usedTiles)
     }
+
+    const guess = usedTiles.reduce((word, laatta) => {
+        return word + laatta.dataset.letter
+    }, "")
+    if (!kohdeSanat.includes(guess)) {
+        showAlert("Not in word list")
+        shakeTiles(usedTiles)
+    }
+
+    stopInteraction() 
+    usedTiles.forEach((...params) => spinTile(...params, guess))
 }
 
-// jatka tähän missä katsot onko sana listalla!
+
+function spinTile(laatta, index, guess, array) {
+    const letter = laatta.dataset.letter
+    const key = keyboard.querySelector('[data-key="{$letter}"]') // get the key for this spesific letter
+    setTimeout(() => {
+        laatta.classList.add("spin")
+    }, index * SPIN_ANIMATION_DURATION / 2) // makes the tiles flip one by one, not in the same time
+
+    laatta.addEventListener("transitioned", () => {
+        laatta.classList.remove("spin")
+        if (kohdeSanat[index] === letter) {
+            laatta.dataset.state = "correct"
+            key.classList.add("correct")
+         } else if (kohdeSanat[index] === (letter)) {
+            laatta.dataset.state = "wrong-location"
+            key.classList.add("wrong-location")
+         } else {
+            laatta.dataset.state = "wrong"
+            key.classList.add("wrong")
+        }
+
+        if (index === array.length - 1) {
+            tile.addEventListener("transitioned", () => {
+            startInteraction()
+        })} // Tähän jäit, jostain syystä flip ei toimi oikein, ja sanojen checkkaus on outo
+    })
+}
+
 
 function getUsedTiles() {
-    return arvausGrid.querySelectorAll('[data-state="active"]') //evert tile that is used, is no longer usable
+    return arvausGrid.querySelectorAll('[data-state="used"]') //evert tile that is used, is no longer usable
 }
 
 function showAlert(message, duration = 1000) {

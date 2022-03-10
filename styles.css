@@ -92,6 +92,7 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
+    transition: transform 250ms linear; /* 250 becouse the flipping gappens 2 times with 90 deg */
 }
 
 .laatta[data-state="active"] {
@@ -115,6 +116,10 @@ body {
 
 .laatta.shake {
     animation: shake 250ms ease-in-out;
+}
+
+.laatta.spin{
+  transform: rotateX(90deg)
 }
 
 @keyframes shake {
