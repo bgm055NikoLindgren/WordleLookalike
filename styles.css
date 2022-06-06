@@ -125,7 +125,7 @@ body {
 }
 
 .laatta.dance {
-  animation: dance 500ms ease-in-out;
+  animation: dance 5000ms ease-in-out;
 }
 
 .laatta.spin{
