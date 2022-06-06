@@ -13,6 +13,11 @@ body {
     padding: 1em;
 }
 
+.description {
+  color: white;
+  text-align: center;
+}
+
 .keyboard {    
     display: grid;
     grid-template-columns: repeat(20, minmax(auto, 1.25em));
@@ -35,7 +40,7 @@ body {
         calc(var(--lightness-offset, 0%) + var(--lightness, 51%))       /* These are the variables */
       );
     color: white;
-    fill: white;
+    fill: rgb(255, 0, 0);
     text-transform: uppercase;
     border-radius: .25em;
     cursor: pointer;
@@ -86,7 +91,7 @@ body {
 .laatta {
     font-size: 2em;
     color: white;
-    border: .05em solid hsl(240, 2%, 23%);
+    border: .03em solid rgb(255, 0, 0);
     text-transform: uppercase;
     font-weight: bold;
     display: flex;
@@ -126,6 +131,7 @@ body {
 .laatta.spin{
   transform: rotateX(90deg)
 }
+
 
 @keyframes shake {
     10% {
@@ -179,10 +185,10 @@ body {
     }
   }
 
-  .laatta[data-state="used"]{
+  /* .laatta[data-state="used"]{            // this is the zoom effect when going to next state, but it doesn't really work with shake well!
     animation: zoom-in-zoom-out 50ms ease;
-  
   }
+  
   @keyframes zoom-in-zoom-out {
     0% {
       transform: scale(1, 1);
@@ -193,7 +199,7 @@ body {
     100% {
       transform: scale(1, 1);
     }
-  }
+  } */
 
 .alert-container {
     position: fixed;

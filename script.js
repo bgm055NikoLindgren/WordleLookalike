@@ -1,5 +1,4 @@
 const kohdeSanat = [
-    [
         "cigar",
         "rebut",
         "sissy",
@@ -2316,9 +2315,7 @@ const kohdeSanat = [
         "rural",
         "shave"
         ]
-]
 const vaaratSanat = [
-    [
         "aahed",
         "aalii",
         "aargh",
@@ -15292,23 +15289,26 @@ const vaaratSanat = [
         "rural",
         "shave"
         ]
-]
 
+const maxLength = 5
 const SPIN_ANIMATION_DURATION = 500
 const DANCE_ANIMATION_DURATION = 500
 const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
 const guessGrid = document.querySelector("[data-guess-grid]")
-const maxLength = 5
+
 
 // here we pick the starting day of our game, and regarding to that, every single day has a diffirent word
-const offsetFromDate = new Date(2022, 5, 9) // staring day now is 9th of may 2022
+const offsetFromDate = new Date(2022, 4, 5) // staring day now is 5th of may 2022
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24  // this converts ms to days
 const oikeaSana = kohdeSanat[Math.floor(dayOffset)] // rounds the number down
 
-// console.log(dayOffset) // <--- comment that off, so you can see how many days its been since this started
+// in the oikeaSana, you can easily just put a word you like to use, just also remember to add it to kohdeSanat and vaaratSanat
+// Ä, Ö or Å or orothers dont work
 
+// console.log(dayOffset) // <--- comment that off, so you can see how many days its been since this started
+// you can also change the the new Date to change the word (yyyy-mm-dd)
 
  startInteraction()
  
@@ -15330,7 +15330,7 @@ function handleMouseClick(e) {
         return
     }
 
-    if (e.target.matches("[data-enter")) {
+    if (e.target.matches("[data-enter]")) {
         submitGuess()
         return
     }
@@ -15342,16 +15342,18 @@ function handleMouseClick(e) {
 }
 
 function handleKeyPress(e) {
-    // console.log(e) /*<---- comment that out, and you can see in browser when you click a button, that, it is called, you must also comment out the startInteraction()*/
+    // console.log(e) /*<---- comment that out, and you can see in browser when you click a button, that it is called*/
     if (e.key === "Enter") {
     submitGuess()
     return
+
     }
     if (e.key === "Backspace" || e.key === "Delete"){
     deleteKey()
     return
+
     }
-    if (e.key.match(/^[a-z$]/)) { // Do we have one letter, that is between A to Z in our key?
+    if (e.key.match(/^[a-z]$/)) { // Do we have one letter, that is between A to Z in our key?
     pressKey(e.key)              // if yes, we call this
     return
     }
@@ -15401,12 +15403,14 @@ function submitGuess() {
 
 function spinTile(laatta, index, array, guess) {
     const letter = laatta.dataset.letter
-    const key = keyboard.querySelector(`[data-key="${letter}"i]`) // get the key for this spesific letter
+    const key = keyboard.querySelector(`[data-key="${letter}"i]`) // get the key for this spesific letter, i stands for case sensitivity
     setTimeout(() => {
         laatta.classList.add("spin")
-    }, index * SPIN_ANIMATION_DURATION / 2) // makes the tiles flip one by one, not in the same time
+    }, (index * SPIN_ANIMATION_DURATION) / 2) // makes the tiles flip one by one, not in the same time
 
-    laatta.addEventListener("transitioned", () => {
+    laatta.addEventListener(
+        "transitionend",
+        () => {
         laatta.classList.remove("spin")
         if (oikeaSana[index] === letter) {
             laatta.dataset.state = "correct"
@@ -15420,7 +15424,9 @@ function spinTile(laatta, index, array, guess) {
         }
 
         if (index === array.length - 1) {
-            laatta.addEventListener("transitioned", () => {
+            laatta.addEventListener(
+            "transitionend", 
+            () => {
                 startInteraction()
                 checkWinLose(guess, array)
               },
@@ -15442,11 +15448,11 @@ function showAlert(message, duration = 1000) {
     alert.textContent = message
     alert.classList.add("alert")
     alertContainer.prepend(alert)  //adding the newest alert to the top of the list
-
     if (duration == null) return 
+
         setTimeout(() => {
             alert.classList.add("hide")  
-            alert.addEventListener("transitioned", () => {
+            alert.addEventListener("transitionend", () => {
                 alert.remove()
             })
         }, duration)
