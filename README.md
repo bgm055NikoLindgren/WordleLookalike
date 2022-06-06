@@ -6,5 +6,3 @@ Done with the help of this video
 [LINK](https://www.youtube.com/watch?v=Wak7iN4JZzU&t=1526s)
 
 Thanks Kyle!
-
-## PROJECT STILL IN PROGRESS
