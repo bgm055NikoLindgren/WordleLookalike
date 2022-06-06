@@ -15295,13 +15295,14 @@ const vaaratSanat = [
 ]
 
 const SPIN_ANIMATION_DURATION = 500
+const DANCE_ANIMATION_DURATION = 500
 const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
-const arvausGrid = document.querySelector("[data-arvaus-grid]")
+const guessGrid = document.querySelector("[data-guess-grid]")
 const maxLength = 5
 
 // here we pick the starting day of our game, and regarding to that, every single day has a diffirent word
-const offsetFromDate = new Date(2022, 1, 9) // staring day now is 9th of february 2022
+const offsetFromDate = new Date(2022, 5, 9) // staring day now is 9th of may 2022
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24  // this converts ms to days
 const oikeaSana = kohdeSanat[Math.floor(dayOffset)] // rounds the number down
@@ -15336,7 +15337,7 @@ function handleMouseClick(e) {
 
     if (e.target.matches("[data-delete]")) {
         deleteKey()
-        
+        return
     }
 }
 
@@ -15352,7 +15353,7 @@ function handleKeyPress(e) {
     }
     if (e.key.match(/^[a-z$]/)) { // Do we have one letter, that is between A to Z in our key?
     pressKey(e.key)              // if yes, we call this
-    
+    return
     }
 
 }
@@ -15360,10 +15361,10 @@ function handleKeyPress(e) {
 function pressKey(key) {
     const usedTiles = getUsedTiles()  // no more than 5 letters in a word
     if (usedTiles.length >= maxLength) return
-    const nextLaatta = arvausGrid.querySelector(":not([data-letter])")      // We take the fisrt tile that does not have a letter on it
-    nextLaatta.dataset.letter = key.toLowerCase()                           // We take the next tile that does not have property in it
-    nextLaatta.textContent = key
-    nextLaatta.dataset.state = "used"
+    const nextTile = guessGrid.querySelector(":not([data-letter])")      // We take the first tile that does not have a letter on it
+    nextTile.dataset.letter = key.toLowerCase()                           // We take the next tile that does not have property in it
+    nextTile.textContent = key
+    nextTile.dataset.state = "used"
 }
 
 function deleteKey() {
@@ -15380,14 +15381,17 @@ function submitGuess() {
     if (usedTiles.length !== maxLength) {
         showAlert("The word must be 5 letters long!")
         shakeTiles(usedTiles)
+        return
     }
 
     const guess = usedTiles.reduce((word, laatta) => {
         return word + laatta.dataset.letter
     }, "")
-    if (!kohdeSanat.includes(guess)) {
+
+    if (!vaaratSanat.includes(guess)) {
         showAlert("Not in word list")
         shakeTiles(usedTiles)
+        return
     }
 
     stopInteraction() 
@@ -15395,19 +15399,19 @@ function submitGuess() {
 }
 
 
-function spinTile(laatta, index, guess, array) {
+function spinTile(laatta, index, array, guess) {
     const letter = laatta.dataset.letter
-    const key = keyboard.querySelector('[data-key="{$letter}"]') // get the key for this spesific letter
+    const key = keyboard.querySelector(`[data-key="${letter}"i]`) // get the key for this spesific letter
     setTimeout(() => {
         laatta.classList.add("spin")
     }, index * SPIN_ANIMATION_DURATION / 2) // makes the tiles flip one by one, not in the same time
 
     laatta.addEventListener("transitioned", () => {
         laatta.classList.remove("spin")
-        if (kohdeSanat[index] === letter) {
+        if (oikeaSana[index] === letter) {
             laatta.dataset.state = "correct"
             key.classList.add("correct")
-         } else if (kohdeSanat[index] === (letter)) {
+         } else if (oikeaSana.includes(letter)) {
             laatta.dataset.state = "wrong-location"
             key.classList.add("wrong-location")
          } else {
@@ -15416,15 +15420,21 @@ function spinTile(laatta, index, guess, array) {
         }
 
         if (index === array.length - 1) {
-            tile.addEventListener("transitioned", () => {
-            startInteraction()
-        })} // Tähän jäit, jostain syystä flip ei toimi oikein, ja sanojen checkkaus on outo
-    })
+            laatta.addEventListener("transitioned", () => {
+                startInteraction()
+                checkWinLose(guess, array)
+              },
+              { once: true }
+            )
+          }
+        },
+        { once: true }
+      )
 }
 
 
 function getUsedTiles() {
-    return arvausGrid.querySelectorAll('[data-state="used"]') //evert tile that is used, is no longer usable
+    return guessGrid.querySelectorAll('[data-state="used"]') //evert tile that is used, is no longer usable
 }
 
 function showAlert(message, duration = 1000) {
@@ -15435,7 +15445,7 @@ function showAlert(message, duration = 1000) {
 
     if (duration == null) return 
         setTimeout(() => {
-            alert.classList.add("hide")
+            alert.classList.add("hide")  
             alert.addEventListener("transitioned", () => {
                 alert.remove()
             })
@@ -15453,4 +15463,34 @@ function shakeTiles(tiles) {
         { once: true }
       )
     })
-  }
+}
+
+function checkWinLose(guess, tiles) {
+    if (guess === oikeaSana) {
+        showAlert("Olet Viineri", 5000)
+        danceTiles(tiles)
+        stopInteraction()
+        return
+      }
+    
+      const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])")
+      if (remainingTiles.length === 0) {
+        showAlert(oikeaSana.toUpperCase(), null)
+        stopInteraction()
+      }
+    }
+
+    function danceTiles(tiles) {
+        tiles.forEach((laatta, index) => {
+          setTimeout(() => {
+            laatta.classList.add("dance")
+            laatta.addEventListener(
+              "animationend",
+              () => {
+                laatta.classList.remove("dance")
+              },
+              { once: true }
+            )
+          }, (index * DANCE_ANIMATION_DURATION) / 5)
+        })
+      }
