@@ -15481,7 +15481,7 @@ function checkWinLose(guess, tiles) {
     
       const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])")
       if (remainingTiles.length === 0) {
-        showAlert(oikeaSana.toUpperCase(), null) // comment this out if you don't want to show the correct answer after 6 failures
+       showAlert(oikeaSana.toUpperCase(), null) // comment this out if you don't want to show the correct answer after 6 failures
         stopInteraction()
       }
     }
